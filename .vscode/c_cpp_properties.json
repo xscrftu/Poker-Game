@@ -1,0 +1,16 @@
+{
+    "configurations": [
+        {
+            "name" : "Win32",
+            "intelliSenseMode": "windows-gcc-x64",
+            "compilerPath": "D:\\C\\msys64\\ucrt64\\bin\\g++.exe",
+            "cStandard": "c11",
+            "cppStandard": "c++11",
+            "compilerArgs": [
+                "-lmingw32",
+                "-static"
+            ]
+        }
+    ],
+    "version": 4
+}
