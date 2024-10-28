@@ -1,21 +1,76 @@
 #include <iostream>
+#include <vector>
+#include <ctime>
+#include <algorithm>
 
 enum class CardSuit {
-    Hearts, Diamond, Spades, Clubs
+    Hearts, Diamonds, Spades, Clubs
 };
 
 enum class CardRank {
-    Two = 2, Three = 3, Four = 4, Five = 5, Six = 6,
-    Seven = 7, Eight = 8, Nine = 9, Ten = 10, Jack = 11, Queen = 12,
-    King = 13, Ace = 14
+    Two = 2, Three, Four, Five, Six,
+    Seven, Eight, Nine, Ten, Jack, Queen,
+    King, Ace
 };
 
-struct Card {
-    CardSuit Suit;
-    CardRank Rank;
+struct Card
+{
+private:
+    CardSuit suit;
+    CardRank rank;
+public:
+    Card() {}
 
-    Card() = default;
-    Card(CardRank rank, CardSuit suit) : Suit(suit), Rank(rank) {}
+    Card(CardRank rank, CardSuit suit)
+    {
+        this->suit = suit;
+        this->rank = rank;
+    }
+
+    CardSuit getSuit() const
+    {
+        return suit;
+    }
+    CardRank getRank() const
+    {
+        return rank;
+    }
+};
+
+struct Deck
+{
+private:
+    std::vector<Card> deck;
+public:
+    void shuffle()
+    {
+        std::srand(std::time(nullptr));
+        std::random_shuffle(deck.begin(), deck.end());
+    }
+
+    Deck()
+    {
+        for (CardSuit suit : {CardSuit::Hearts, CardSuit::Diamonds, CardSuit::Clubs, CardSuit::Spades})
+        {
+            for (CardRank rank : {CardRank::Two, CardRank::Three, CardRank::Four, CardRank::Five, CardRank::Six, CardRank::Seven, CardRank::Eight, CardRank::Nine, CardRank::Ten, CardRank::Jack, CardRank::Queen, CardRank::King, CardRank::Ace})
+            {
+                deck.push_back(Card(rank, suit));
+            }
+        }
+        shuffle();
+    }
+
+    Card draw()
+    {
+        if (deck.empty())
+        {
+            std::cout << "Hết bài rồi";
+        }
+
+        Card drawnCard = deck.back();
+        deck.pop_back();
+        return drawnCard;
+    }
 };
 
 struct Hand {
@@ -46,7 +101,7 @@ std::string CardRankToString(CardRank rank) {
 std::string CardSuitToString(CardSuit suit) {
     switch (suit) {
         case CardSuit::Hearts: return "Hearts";
-        case CardSuit::Diamond: return "Diamond";
+        case CardSuit::Diamonds: return "Diamond";
         case CardSuit::Spades: return "Spades";
         case CardSuit::Clubs: return "Clubs";
         default: return "Unknown";
@@ -58,7 +113,7 @@ void SortHand(Hand* handPlayer) {
         Card key = handPlayer->cards[i];
         int j = i - 1;
         
-        while (j >= 0 && static_cast<int>(handPlayer->cards[j].Rank) > static_cast<int>(key.Rank)) {
+        while (j >= 0 && static_cast<int>(handPlayer->cards[j].getRank()) > static_cast<int>(key.getRank())) {
             handPlayer->cards[j + 1] = handPlayer->cards[j];
             --j;
         }
@@ -68,18 +123,18 @@ void SortHand(Hand* handPlayer) {
 
 void PrintHand(const Hand& hand) {
     for (const auto& card : hand.cards) {
-        std::cout << "Card: Rank " << CardRankToString(card.Rank) 
-                  << ", Suit " << CardSuitToString(card.Suit) << std::endl;
+        std::cout << "Card: Rank " << CardRankToString(card.getRank()) 
+                  << ", Suit " << CardSuitToString(card.getSuit()) << std::endl;
     }
 }
 
 bool isPair(Hand* handPlayer) {
     int pairCount = 0;
     for (int i = 0; i < 4; ++i) {
-        if (handPlayer->cards[i].Rank == handPlayer->cards[i + 1].Rank) {
+        if (handPlayer->cards[i].getRank() == handPlayer->cards[i + 1].getRank()) {
             ++pairCount;
             ++i;  // Bỏ qua quân bài tiếp theo
-            if (i < 3 && handPlayer->cards[i].Rank == handPlayer->cards[i + 1].Rank) {
+            if (i < 3 && handPlayer->cards[i].getRank() == handPlayer->cards[i + 1].getRank()) {
                 return false;  // Tứ quý hoặc bộ ba, không phải một đôi
             }
         }
@@ -90,8 +145,8 @@ bool isPair(Hand* handPlayer) {
 bool isSet(Hand* handPlayer) {
     int count = 0;
     for (int i = 0; i < 3; ++i) {
-        if (handPlayer->cards[i].Rank == handPlayer->cards[i + 1].Rank &&
-            handPlayer->cards[i + 1].Rank == handPlayer->cards[i + 2].Rank) {
+        if (handPlayer->cards[i].getRank() == handPlayer->cards[i + 1].getRank() &&
+            handPlayer->cards[i + 1].getRank() == handPlayer->cards[i + 2].getRank()) {
             ++count;
         }
     }
@@ -101,11 +156,11 @@ bool isSet(Hand* handPlayer) {
 bool isTwoPair(Hand* handPlayer) {
     int count = 0;
     for (int i = 0; i < 4; ++i) {
-        if (handPlayer->cards[i].Rank == handPlayer->cards[i + 1].Rank) {
+        if (handPlayer->cards[i].getRank() == handPlayer->cards[i + 1].getRank()) {
             ++count;
             ++i;  // Skip the next card in the current pair
             // Check for a third card of the same rank (indicating three or four of a kind)
-            if (i < 3 && handPlayer->cards[i].Rank == handPlayer->cards[i + 1].Rank) {
+            if (i < 3 && handPlayer->cards[i].getRank() == handPlayer->cards[i + 1].getRank()) {
                 return false;  // More than a pair, not a two-pair hand
             }
         }
@@ -116,7 +171,7 @@ bool isTwoPair(Hand* handPlayer) {
 
 bool isStraight(Hand* handPlayer) {
     for (int i = 0; i < 4; ++i) {
-        if (static_cast<int>(handPlayer->cards[i].Rank) + 1 != static_cast<int>(handPlayer->cards[i + 1].Rank)) {
+        if (static_cast<int>(handPlayer->cards[i].getRank()) + 1 != static_cast<int>(handPlayer->cards[i + 1].getRank())) {
             return false;
         }
     }
@@ -125,7 +180,7 @@ bool isStraight(Hand* handPlayer) {
 
 bool isFlush(Hand* handPlayer) {
     for (int i = 0; i < 4; ++i) {
-        if (handPlayer->cards[i].Suit != handPlayer->cards[i + 1].Suit) {
+        if (handPlayer->cards[i].getSuit() != handPlayer->cards[i + 1].getSuit()) {
             return false;
         }
     }
@@ -138,8 +193,8 @@ bool isFullHouse(Hand* handPlayer) {
 
 bool isQuad(Hand* handPlayer) {
     // Kiểm tra tứ quý
-    return (handPlayer->cards[0].Rank == handPlayer->cards[3].Rank) || 
-           (handPlayer->cards[1].Rank == handPlayer->cards[4].Rank);
+    return (handPlayer->cards[0].getRank() == handPlayer->cards[3].getRank()) || 
+           (handPlayer->cards[1].getRank() == handPlayer->cards[4].getRank());
 }
 
 bool isStraightFlush(Hand* handPlayer) {
@@ -147,13 +202,13 @@ bool isStraightFlush(Hand* handPlayer) {
 }
 
 int main() {
-    Hand hand = {
-        Card(CardRank::Ace, CardSuit::Hearts),
-        Card(CardRank::Ace, CardSuit::Diamond),
-        Card(CardRank::Six, CardSuit::Spades),  
-        Card(CardRank::Six, CardSuit::Clubs),
-        Card(CardRank::Six, CardSuit::Hearts)
-    };
+    Hand hand;
+    Deck deck;
+
+    for (int i = 0; i < 5; i++)
+    {
+        hand.cards[i] = deck.draw();
+    }
 
     std::cout << "Hand before sorting:" << std::endl;
     PrintHand(hand);
