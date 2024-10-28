@@ -41,6 +41,19 @@ struct Deck
 {
 private:
     std::vector<Card> deck;
+
+    static std::vector<Card> createStandardDeck()
+    {
+        std::vector<Card> standardDeck;
+        for (CardSuit suit : {CardSuit::Hearts, CardSuit::Diamonds, CardSuit::Clubs, CardSuit::Spades})
+        {
+            for (CardRank rank : {CardRank::Two, CardRank::Three, CardRank::Four, CardRank::Five, CardRank::Six, CardRank::Seven, CardRank::Eight, CardRank::Nine, CardRank::Ten, CardRank::Jack, CardRank::Queen, CardRank::King, CardRank::Ace})
+            {
+                standardDeck.push_back(Card(rank, suit));
+            }
+        }
+        return standardDeck;
+    }
 public:
     void shuffle()
     {
@@ -48,15 +61,8 @@ public:
         std::random_shuffle(deck.begin(), deck.end());
     }
 
-    Deck()
+    Deck() : deck(createStandardDeck())
     {
-        for (CardSuit suit : {CardSuit::Hearts, CardSuit::Diamonds, CardSuit::Clubs, CardSuit::Spades})
-        {
-            for (CardRank rank : {CardRank::Two, CardRank::Three, CardRank::Four, CardRank::Five, CardRank::Six, CardRank::Seven, CardRank::Eight, CardRank::Nine, CardRank::Ten, CardRank::Jack, CardRank::Queen, CardRank::King, CardRank::Ace})
-            {
-                deck.push_back(Card(rank, suit));
-            }
-        }
         shuffle();
     }
 
