@@ -1,26 +1,85 @@
 #include <iostream>
+<<<<<<< HEAD
 #include <cmath>
+=======
+#include <vector>
+#include <ctime>
+#include <algorithm>
+
+>>>>>>> cd8e28aaacb770b754179962290bbadc5823e400
 enum class CardSuit {
-    Hearts, Diamond, Spades, Clubs
+    Hearts, Diamonds, Spades, Clubs
 };
 
 enum class CardRank {
-    Two = 2, Three = 3, Four = 4, Five = 5, Six = 6,
-    Seven = 7, Eight = 8, Nine = 9, Ten = 10, Jack = 11, Queen = 12,
-    King = 13, Ace = 14
+    Two = 2, Three, Four, Five, Six,
+    Seven, Eight, Nine, Ten, Jack, Queen,
+    King, Ace
 };
 
-struct Card {
-    CardSuit Suit;
-    CardRank Rank;
+/// @brief The Card struct, represent a poker card.
+struct Card
+{
+public:
+    /// @brief The suit of the card.
+    CardSuit Suit = CardSuit::Clubs;
+    /// @brief The rank of the card
+    CardRank Rank = CardRank::Two;
 
     Card() = default;
     Card(CardRank rank, CardSuit suit) : Suit(suit), Rank(rank) {}
 };
 
+<<<<<<< HEAD
 enum class HandRank {
     StraightFlush = 9, Quad = 8, FullHouse = 7, Flush = 6, 
     Straight = 5, Set = 4, TwoPair = 3, Pair = 2, HighCard = 1
+=======
+struct Deck
+{
+private:
+    std::vector<Card> deck;
+
+    static std::vector<Card> createStandardDeck()
+    {
+        std::vector<Card> standardDeck;
+        for (CardSuit suit : {CardSuit::Hearts, CardSuit::Diamonds, CardSuit::Clubs, CardSuit::Spades})
+        {
+            for (CardRank rank : {CardRank::Two, CardRank::Three, CardRank::Four, CardRank::Five, CardRank::Six, CardRank::Seven, CardRank::Eight, CardRank::Nine, CardRank::Ten, CardRank::Jack, CardRank::Queen, CardRank::King, CardRank::Ace})
+            {
+                standardDeck.push_back(Card(rank, suit));
+            }
+        }
+        return standardDeck;
+    }
+public:
+    void shuffle()
+    {
+        std::srand(std::time(nullptr));
+        std::random_shuffle(deck.begin(), deck.end());
+    }
+
+    Deck() : deck(createStandardDeck())
+    {
+        shuffle();
+    }
+
+    Card draw()
+    {
+        if (deck.empty())
+        {
+            std::cout << "Hết bài rồi";
+        }
+
+        Card drawnCard = deck.back();
+        deck.pop_back();
+        return drawnCard;
+    }
+};
+
+struct Hand {
+    Card cards[5];
+>>>>>>> cd8e28aaacb770b754179962290bbadc5823e400
 };
 
 struct Hand {
@@ -51,7 +110,7 @@ std::string CardRankToString(CardRank rank) {
 std::string CardSuitToString(CardSuit suit) {
     switch (suit) {
         case CardSuit::Hearts: return "Hearts";
-        case CardSuit::Diamond: return "Diamond";
+        case CardSuit::Diamonds: return "Diamond";
         case CardSuit::Spades: return "Spades";
         case CardSuit::Clubs: return "Clubs";
         default: return "Unknown";
@@ -258,6 +317,7 @@ void CompareHand(Hand* player1, Hand* player2){
     }
 }
 int main() {
+<<<<<<< HEAD
     Hand hand = {
         Card(CardRank::Ace, CardSuit::Hearts),
         Card(CardRank::King, CardSuit::Diamond),
@@ -272,6 +332,19 @@ int main() {
         Card(CardRank::Ten, CardSuit::Clubs),
         Card(CardRank::Ten, CardSuit::Hearts)
     };
+=======
+    Hand hand;
+    Deck deck;
+
+    for (int i = 0; i < 5; i++)
+    {
+        hand.cards[i] = deck.draw();
+    }
+
+    std::cout << "Hand before sorting:" << std::endl;
+    PrintHand(hand);
+
+>>>>>>> cd8e28aaacb770b754179962290bbadc5823e400
     SortHand(&hand);
     SortHand(&hand1);
 
