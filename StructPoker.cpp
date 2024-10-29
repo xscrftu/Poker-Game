@@ -1,12 +1,9 @@
 #include <iostream>
-<<<<<<< HEAD
 #include <cmath>
-=======
 #include <vector>
 #include <ctime>
 #include <algorithm>
 
->>>>>>> cd8e28aaacb770b754179962290bbadc5823e400
 enum class CardSuit {
     Hearts, Diamonds, Spades, Clubs
 };
@@ -15,6 +12,10 @@ enum class CardRank {
     Two = 2, Three, Four, Five, Six,
     Seven, Eight, Nine, Ten, Jack, Queen,
     King, Ace
+};
+
+enum class HandRank {
+    HighCard = 1, Pair, TwoPair, Set, Straight, Flush, FullHouse, Quad, StraightFlush
 };
 
 /// @brief The Card struct, represent a poker card.
@@ -30,11 +31,6 @@ public:
     Card(CardRank rank, CardSuit suit) : Suit(suit), Rank(rank) {}
 };
 
-<<<<<<< HEAD
-enum class HandRank {
-    StraightFlush = 9, Quad = 8, FullHouse = 7, Flush = 6, 
-    Straight = 5, Set = 4, TwoPair = 3, Pair = 2, HighCard = 1
-=======
 struct Deck
 {
 private:
@@ -75,11 +71,6 @@ public:
         deck.pop_back();
         return drawnCard;
     }
-};
-
-struct Hand {
-    Card cards[5];
->>>>>>> cd8e28aaacb770b754179962290bbadc5823e400
 };
 
 struct Hand {
@@ -317,50 +308,17 @@ void CompareHand(Hand* player1, Hand* player2){
     }
 }
 int main() {
-<<<<<<< HEAD
-    Hand hand = {
-        Card(CardRank::Ace, CardSuit::Hearts),
-        Card(CardRank::King, CardSuit::Diamond),
-        Card(CardRank::Queen, CardSuit::Spades),  
-        Card(CardRank::Jack, CardSuit::Clubs),
-        Card(CardRank::Ten, CardSuit::Hearts)
-    };
-    Hand hand1 = {
-        Card(CardRank::King, CardSuit::Hearts),
-        Card(CardRank::King, CardSuit::Diamond),
-        Card(CardRank::King, CardSuit::Spades),  
-        Card(CardRank::Ten, CardSuit::Clubs),
-        Card(CardRank::Ten, CardSuit::Hearts)
-    };
-=======
-    Hand hand;
+    Hand hand1;
+    Hand hand2;
     Deck deck;
 
     for (int i = 0; i < 5; i++)
     {
-        hand.cards[i] = deck.draw();
+        hand1.cards[i] = deck.draw();
+        hand2.cards[i] = deck.draw();
     }
 
-    std::cout << "Hand before sorting:" << std::endl;
-    PrintHand(hand);
-
->>>>>>> cd8e28aaacb770b754179962290bbadc5823e400
-    SortHand(&hand);
-    SortHand(&hand1);
-
     std::cout << "Player 1 "<< std::endl;
-    PrintHand(hand);
-    std::cout << "Hand evaluation:" << std::endl;
-    std::cout << "Pair: " << isPair(&hand) << std::endl;
-    std::cout << "Set: " << isSet(&hand) << std::endl;
-    std::cout << "Two Pair: " << isTwoPair(&hand) << std::endl;
-    std::cout << "Straight: " << isStraight(&hand) << std::endl;
-    std::cout << "Flush: " << isFlush(&hand) << std::endl;
-    std::cout << "Full House: " << isFullHouse(&hand) << std::endl;
-    std::cout << "Quad: " << isQuad(&hand) << std::endl;
-    std::cout << "Straight Flush: " << isStraightFlush(&hand) << std::endl;
-
-    std::cout << "\n\nPlayer 2:" << std::endl;
     PrintHand(hand1);
     std::cout << "Hand evaluation:" << std::endl;
     std::cout << "Pair: " << isPair(&hand1) << std::endl;
@@ -372,7 +330,19 @@ int main() {
     std::cout << "Quad: " << isQuad(&hand1) << std::endl;
     std::cout << "Straight Flush: " << isStraightFlush(&hand1) << std::endl;
 
-    double score1 = EvaluateHand(&hand), score2 = EvaluateHand(&hand1);
+    std::cout << "\n\nPlayer 2:" << std::endl;
+    PrintHand(hand2);
+    std::cout << "Hand evaluation:" << std::endl;
+    std::cout << "Pair: " << isPair(&hand2) << std::endl;
+    std::cout << "Set: " << isSet(&hand2) << std::endl;
+    std::cout << "Two Pair: " << isTwoPair(&hand2) << std::endl;
+    std::cout << "Straight: " << isStraight(&hand2) << std::endl;
+    std::cout << "Flush: " << isFlush(&hand2) << std::endl;
+    std::cout << "Full House: " << isFullHouse(&hand2) << std::endl;
+    std::cout << "Quad: " << isQuad(&hand2) << std::endl;
+    std::cout << "Straight Flush: " << isStraightFlush(&hand2) << std::endl;
+
+    double score1 = EvaluateHand(&hand1), score2 = EvaluateHand(&hand2);
     if (score1 < score2){
         std::cout << "Player 2 win";
     }
