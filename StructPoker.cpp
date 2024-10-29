@@ -13,28 +13,17 @@ enum class CardRank {
     King, Ace
 };
 
+/// @brief The Card struct, represent a poker card.
 struct Card
 {
-private:
-    CardSuit suit;
-    CardRank rank;
 public:
-    Card() {}
+    /// @brief The suit of the card.
+    CardSuit Suit = CardSuit::Clubs;
+    /// @brief The rank of the card
+    CardRank Rank = CardRank::Two;
 
-    Card(CardRank rank, CardSuit suit)
-    {
-        this->suit = suit;
-        this->rank = rank;
-    }
-
-    CardSuit getSuit() const
-    {
-        return suit;
-    }
-    CardRank getRank() const
-    {
-        return rank;
-    }
+    Card() = default;
+    Card(CardRank rank, CardSuit suit) : Suit(suit), Rank(rank) {}
 };
 
 struct Deck
@@ -119,7 +108,7 @@ void SortHand(Hand* handPlayer) {
         Card key = handPlayer->cards[i];
         int j = i - 1;
         
-        while (j >= 0 && static_cast<int>(handPlayer->cards[j].getRank()) > static_cast<int>(key.getRank())) {
+        while (j >= 0 && static_cast<int>(handPlayer->cards[j].Rank) > static_cast<int>(key.Rank)) {
             handPlayer->cards[j + 1] = handPlayer->cards[j];
             --j;
         }
@@ -129,18 +118,18 @@ void SortHand(Hand* handPlayer) {
 
 void PrintHand(const Hand& hand) {
     for (const auto& card : hand.cards) {
-        std::cout << "Card: Rank " << CardRankToString(card.getRank()) 
-                  << ", Suit " << CardSuitToString(card.getSuit()) << std::endl;
+        std::cout << "Card: Rank " << CardRankToString(card.Rank) 
+                  << ", Suit " << CardSuitToString(card.Suit) << std::endl;
     }
 }
 
 bool isPair(Hand* handPlayer) {
     int pairCount = 0;
     for (int i = 0; i < 4; ++i) {
-        if (handPlayer->cards[i].getRank() == handPlayer->cards[i + 1].getRank()) {
+        if (handPlayer->cards[i].Rank == handPlayer->cards[i + 1].Rank) {
             ++pairCount;
             ++i;  // Bỏ qua quân bài tiếp theo
-            if (i < 3 && handPlayer->cards[i].getRank() == handPlayer->cards[i + 1].getRank()) {
+            if (i < 3 && handPlayer->cards[i].Rank == handPlayer->cards[i + 1].Rank) {
                 return false;  // Tứ quý hoặc bộ ba, không phải một đôi
             }
         }
@@ -151,8 +140,8 @@ bool isPair(Hand* handPlayer) {
 bool isSet(Hand* handPlayer) {
     int count = 0;
     for (int i = 0; i < 3; ++i) {
-        if (handPlayer->cards[i].getRank() == handPlayer->cards[i + 1].getRank() &&
-            handPlayer->cards[i + 1].getRank() == handPlayer->cards[i + 2].getRank()) {
+        if (handPlayer->cards[i].Rank == handPlayer->cards[i + 1].Rank &&
+            handPlayer->cards[i + 1].Rank == handPlayer->cards[i + 2].Rank) {
             ++count;
         }
     }
@@ -162,11 +151,11 @@ bool isSet(Hand* handPlayer) {
 bool isTwoPair(Hand* handPlayer) {
     int count = 0;
     for (int i = 0; i < 4; ++i) {
-        if (handPlayer->cards[i].getRank() == handPlayer->cards[i + 1].getRank()) {
+        if (handPlayer->cards[i].Rank == handPlayer->cards[i + 1].Rank) {
             ++count;
             ++i;  // Skip the next card in the current pair
             // Check for a third card of the same rank (indicating three or four of a kind)
-            if (i < 3 && handPlayer->cards[i].getRank() == handPlayer->cards[i + 1].getRank()) {
+            if (i < 3 && handPlayer->cards[i].Rank == handPlayer->cards[i + 1].Rank) {
                 return false;  // More than a pair, not a two-pair hand
             }
         }
@@ -177,7 +166,7 @@ bool isTwoPair(Hand* handPlayer) {
 
 bool isStraight(Hand* handPlayer) {
     for (int i = 0; i < 4; ++i) {
-        if (static_cast<int>(handPlayer->cards[i].getRank()) + 1 != static_cast<int>(handPlayer->cards[i + 1].getRank())) {
+        if (static_cast<int>(handPlayer->cards[i].Rank) + 1 != static_cast<int>(handPlayer->cards[i + 1].Rank)) {
             return false;
         }
     }
@@ -186,7 +175,7 @@ bool isStraight(Hand* handPlayer) {
 
 bool isFlush(Hand* handPlayer) {
     for (int i = 0; i < 4; ++i) {
-        if (handPlayer->cards[i].getSuit() != handPlayer->cards[i + 1].getSuit()) {
+        if (handPlayer->cards[i].Suit != handPlayer->cards[i + 1].Suit) {
             return false;
         }
     }
@@ -199,8 +188,8 @@ bool isFullHouse(Hand* handPlayer) {
 
 bool isQuad(Hand* handPlayer) {
     // Kiểm tra tứ quý
-    return (handPlayer->cards[0].getRank() == handPlayer->cards[3].getRank()) || 
-           (handPlayer->cards[1].getRank() == handPlayer->cards[4].getRank());
+    return (handPlayer->cards[0].Rank == handPlayer->cards[3].Rank) || 
+           (handPlayer->cards[1].Rank == handPlayer->cards[4].Rank);
 }
 
 bool isStraightFlush(Hand* handPlayer) {
