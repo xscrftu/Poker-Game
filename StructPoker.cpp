@@ -1,12 +1,11 @@
 #include <iostream>
-<<<<<<< HEAD
 #include <cmath>
-=======
 #include <vector>
 #include <ctime>
 #include <algorithm>
+#include <io.h>
+#include <fcntl.h>
 
->>>>>>> cd8e28aaacb770b754179962290bbadc5823e400
 enum class CardSuit {
     Hearts, Diamonds, Spades, Clubs
 };
@@ -15,6 +14,10 @@ enum class CardRank {
     Two = 2, Three, Four, Five, Six,
     Seven, Eight, Nine, Ten, Jack, Queen,
     King, Ace
+};
+
+enum class HandRank {
+    HighCard = 1, Pair, TwoPair, Set, Straight, Flush, FullHouse, Quad, StraightFlush
 };
 
 /// @brief The Card struct, represent a poker card.
@@ -30,11 +33,6 @@ public:
     Card(CardRank rank, CardSuit suit) : Suit(suit), Rank(rank) {}
 };
 
-<<<<<<< HEAD
-enum class HandRank {
-    StraightFlush = 9, Quad = 8, FullHouse = 7, Flush = 6, 
-    Straight = 5, Set = 4, TwoPair = 3, Pair = 2, HighCard = 1
-=======
 struct Deck
 {
 private:
@@ -79,44 +77,38 @@ public:
 
 struct Hand {
     Card cards[5];
->>>>>>> cd8e28aaacb770b754179962290bbadc5823e400
-};
-
-struct Hand {
-    Card cards[5];
     HandRank handPlayer;
 };
-// Chuyển đổi CardRank thành chuỗi
-std::string CardRankToString(CardRank rank) {
+
+std::wstring CardRankToString(CardRank rank) {
     switch (rank) {
-        case CardRank::Two: return "Two";
-        case CardRank::Three: return "Three";
-        case CardRank::Four: return "Four";
-        case CardRank::Five: return "Five";
-        case CardRank::Six: return "Six";
-        case CardRank::Seven: return "Seven";
-        case CardRank::Eight: return "Eight";
-        case CardRank::Nine: return "Nine";
-        case CardRank::Ten: return "Ten";
-        case CardRank::Jack: return "Jack";
-        case CardRank::Queen: return "Queen";
-        case CardRank::King: return "King";
-        case CardRank::Ace: return "Ace";
-        default: return "Unknown";
+        case CardRank::Ace:   return L"Ace";
+        case CardRank::Two:   return L"2";
+        case CardRank::Three: return L"3";
+        case CardRank::Four:  return L"4";
+        case CardRank::Five:  return L"5";
+        case CardRank::Six:   return L"6";
+        case CardRank::Seven: return L"7";
+        case CardRank::Eight: return L"8";
+        case CardRank::Nine:  return L"9";
+        case CardRank::Ten:   return L"10";
+        case CardRank::Jack:  return L"J";
+        case CardRank::Queen: return L"Q";
+        case CardRank::King:  return L"K";
+        default:             return L"Unknown";
     }
 }
 
-// Chuyển đổi CardSuit thành chuỗi
-std::string CardSuitToString(CardSuit suit) {
+std::wstring CardSuitToString(CardSuit suit) {
     switch (suit) {
-        case CardSuit::Hearts: return "Hearts";
-        case CardSuit::Diamonds: return "Diamond";
-        case CardSuit::Spades: return "Spades";
-        case CardSuit::Clubs: return "Clubs";
-        default: return "Unknown";
+        case CardSuit::Hearts: return L"\u2665"; // ♥
+        case CardSuit::Diamonds: return L"\u2666"; // ♦
+        case CardSuit::Spades: return L"\u2660"; // ♠
+        case CardSuit::Clubs: return L"\u2663"; // ♣
+        default: return L"Unknown";
     }
 }
-
+// Sort hand before compare
 void SortHand(Hand* handPlayer) { 
     for (int i = 1; i < 5; ++i) {
         Card key = handPlayer->cards[i];
@@ -132,20 +124,16 @@ void SortHand(Hand* handPlayer) {
 
 void PrintHand(const Hand& hand) {
     for (const auto& card : hand.cards) {
-        std::cout << "Card: Rank " << CardRankToString(card.Rank) 
-                  << ", Suit " << CardSuitToString(card.Suit) << std::endl;
+        std::wcout << L"Card: " << CardRankToString(card.Rank) << L" "
+                   << CardSuitToString(card.Suit) << std::endl;
     }
 }
-
+// Check Pair
 bool isPair(Hand* handPlayer) {
     int pairCount = 0;
     for (int i = 0; i < 4; ++i) {
         if (handPlayer->cards[i].Rank == handPlayer->cards[i + 1].Rank) {
             ++pairCount;
-            // ++i;  // Bỏ qua quân bài tiếp theo
-            // if (i < 3 && handPlayer->cards[i].Rank == handPlayer->cards[i + 1].Rank) {
-            //     return false;  // Tứ quý hoặc bộ ba, không phải một đôi
-            // }
         }
     }
     return pairCount == 1;
@@ -162,6 +150,7 @@ bool isSet(Hand* handPlayer) {
     return count == 1;
 }
 
+// Check Two Pair
 bool isTwoPair(Hand* handPlayer) {
     int count = 0;  // Đếm số cặp
     for (int i = 0; i < 4; ++i) {
@@ -174,7 +163,7 @@ bool isTwoPair(Hand* handPlayer) {
     return count == 2;  // Trả về true nếu có 2 cặp
 }
 
-
+// Check Straight
 bool isStraight(Hand* handPlayer) {
     for (int i = 0; i < 4; ++i) {
         if (static_cast<int>(handPlayer->cards[i].Rank) + 1 != static_cast<int>(handPlayer->cards[i + 1].Rank)) {
@@ -184,6 +173,7 @@ bool isStraight(Hand* handPlayer) {
     return true;
 }
 
+// Check flush
 bool isFlush(Hand* handPlayer) {
     for (int i = 0; i < 4; ++i) {
         if (handPlayer->cards[i].Suit != handPlayer->cards[i + 1].Suit) {
@@ -198,7 +188,7 @@ bool isFullHouse(Hand* handPlayer) {
 }
 
 bool isQuad(Hand* handPlayer) {
-    // Kiểm tra tứ quý
+    // Check Quad or Four of Kind
     return (handPlayer->cards[0].Rank == handPlayer->cards[3].Rank) || 
            (handPlayer->cards[1].Rank == handPlayer->cards[4].Rank);
 }
@@ -206,28 +196,6 @@ bool isQuad(Hand* handPlayer) {
 bool isStraightFlush(Hand* handPlayer) {
     return isStraight(handPlayer) && isFlush(handPlayer);
 }
-
-// double EvaluateHand(Hand* handPlayer) {
-//     if (isStraightFlush(handPlayer)) {
-//         return 9 * 14 +static_cast<int>(handPlayer->cards[4].Rank);
-//     } else if (isQuad(handPlayer)) {
-//         return 8 * 14 + static_cast<int>(handPlayer->cards[3].Rank);  // cards[3], cards[2] will be a quad
-//     } else if (isFullHouse(handPlayer)) {
-//         return 7 * 14 + static_cast<int>(handPlayer->cards[3].Rank);
-//     } else if (isFlush(handPlayer)) {
-//         return 6 * 14 + static_cast<int>(handPlayer->cards[4].Rank);  // Danh gia them
-//     } else if (isStraight(handPlayer)) {
-//         return 5 * 14 +static_cast<int>(handPlayer->cards[4].Rank);
-//     } else if (isSet(handPlayer)) {
-//         return 4 * 14 + static_cast<int>(handPlayer->cards[3].Rank);
-//     } else if (isTwoPair(handPlayer)) {
-//         return HandRank::TwoPair;
-//     } else if (isPair(handPlayer)) {
-//         return HandRank::Pair;
-//     } else {
-//         return HandRank::HighCard; // Nếu không thuộc loại nào khác, sẽ là "High Card"
-//     }
-// }
 
 double EvaluateHand(Hand* handPlayer) {
     if (isStraightFlush(handPlayer)) {
@@ -305,6 +273,19 @@ double EvaluateHand(Hand* handPlayer) {
     }
 }
 
+HandRank getBestHandRank(Hand* hand) {
+    if (isStraightFlush(hand)) return HandRank::StraightFlush;
+    if (isQuad(hand)) return HandRank::Quad;
+    if (isFullHouse(hand)) return HandRank::FullHouse;
+    if (isFlush(hand)) return HandRank::Flush;
+    if (isStraight(hand)) return HandRank::Straight;
+    if (isSet(hand)) return HandRank::Set;
+    if (isTwoPair(hand)) return HandRank::TwoPair;
+    if (isPair(hand)) return HandRank::Pair;
+
+    return HandRank::HighCard; // Mặc định nếu không tìm thấy loại hand nào
+}
+
 
 void CompareHand(Hand* player1, Hand* player2){
     if (player1->handPlayer < player2->handPlayer){
@@ -316,71 +297,52 @@ void CompareHand(Hand* player1, Hand* player2){
         
     }
 }
+std::wstring handRankToString(HandRank rank) {
+    switch (rank) {
+        case HandRank::StraightFlush: return L"Straight Flush";
+        case HandRank::Quad: return L"Quad";
+        case HandRank::FullHouse: return L"Full House";
+        case HandRank::Flush: return L"Flush";
+        case HandRank::Straight: return L"Straight";
+        case HandRank::Set: return L"Set";
+        case HandRank::TwoPair: return L"Two Pair";
+        case HandRank::Pair: return L"One Pair";
+        default: return L"High Card"; // Sử dụng L"" cho chuỗi rộng
+    }
+}
 int main() {
-<<<<<<< HEAD
-    Hand hand = {
-        Card(CardRank::Ace, CardSuit::Hearts),
-        Card(CardRank::King, CardSuit::Diamond),
-        Card(CardRank::Queen, CardSuit::Spades),  
-        Card(CardRank::Jack, CardSuit::Clubs),
-        Card(CardRank::Ten, CardSuit::Hearts)
-    };
-    Hand hand1 = {
-        Card(CardRank::King, CardSuit::Hearts),
-        Card(CardRank::King, CardSuit::Diamond),
-        Card(CardRank::King, CardSuit::Spades),  
-        Card(CardRank::Ten, CardSuit::Clubs),
-        Card(CardRank::Ten, CardSuit::Hearts)
-    };
-=======
-    Hand hand;
+    _setmode(_fileno(stdout), _O_U16TEXT);
+    Hand hand1;
+    Hand hand2;
     Deck deck;
 
     for (int i = 0; i < 5; i++)
     {
-        hand.cards[i] = deck.draw();
+        hand1.cards[i] = deck.draw();
+        hand2.cards[i] = deck.draw();
     }
 
-    std::cout << "Hand before sorting:" << std::endl;
-    PrintHand(hand);
-
->>>>>>> cd8e28aaacb770b754179962290bbadc5823e400
-    SortHand(&hand);
+    std::wcout << "Player 1 "<< std::endl;
     SortHand(&hand1);
-
-    std::cout << "Player 1 "<< std::endl;
-    PrintHand(hand);
-    std::cout << "Hand evaluation:" << std::endl;
-    std::cout << "Pair: " << isPair(&hand) << std::endl;
-    std::cout << "Set: " << isSet(&hand) << std::endl;
-    std::cout << "Two Pair: " << isTwoPair(&hand) << std::endl;
-    std::cout << "Straight: " << isStraight(&hand) << std::endl;
-    std::cout << "Flush: " << isFlush(&hand) << std::endl;
-    std::cout << "Full House: " << isFullHouse(&hand) << std::endl;
-    std::cout << "Quad: " << isQuad(&hand) << std::endl;
-    std::cout << "Straight Flush: " << isStraightFlush(&hand) << std::endl;
-
-    std::cout << "\n\nPlayer 2:" << std::endl;
     PrintHand(hand1);
-    std::cout << "Hand evaluation:" << std::endl;
-    std::cout << "Pair: " << isPair(&hand1) << std::endl;
-    std::cout << "Set: " << isSet(&hand1) << std::endl;
-    std::cout << "Two Pair: " << isTwoPair(&hand1) << std::endl;
-    std::cout << "Straight: " << isStraight(&hand1) << std::endl;
-    std::cout << "Flush: " << isFlush(&hand1) << std::endl;
-    std::cout << "Full House: " << isFullHouse(&hand1) << std::endl;
-    std::cout << "Quad: " << isQuad(&hand1) << std::endl;
-    std::cout << "Straight Flush: " << isStraightFlush(&hand1) << std::endl;
+    HandRank rank1 = getBestHandRank(&hand1); // Gọi hàm và lưu trữ kết quả
+    std::wcout << L"Hand strength: " << handRankToString(rank1) << std::endl;
 
-    double score1 = EvaluateHand(&hand), score2 = EvaluateHand(&hand1);
+    std::wcout << "\n\nPlayer 2:" << std::endl;
+    SortHand(&hand2);
+    PrintHand(hand2);
+    HandRank rank2 = getBestHandRank(&hand2); // Gọi hàm và lưu trữ kết quả
+    std::wcout << L"Hand strength: " << handRankToString(rank2) << std::endl << std::endl;
+
+    double score1 = EvaluateHand(&hand1), score2 = EvaluateHand(&hand2);
     if (score1 < score2){
-        std::cout << "Player 2 win";
+        std::wcout << "Player 2 win";
     }
     else if (score1 > score2){
-        std::cout << "Player 1 win";
+        std::wcout << "Player 1 win";
     }
     else {
-        std::cout << "Tier";
+        std::wcout << "Tier";
     }
     return 0;
 }
