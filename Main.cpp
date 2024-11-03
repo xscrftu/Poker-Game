@@ -32,7 +32,7 @@ int main() {
         std::wstring playerName;
         std::wcout << L"Enter name for Player " << i + 1 << ": ";
         std::wcin >> playerName;
-        Player player{ playerName };
+        Player player{playerName};
         players.push_back(player);
     }
 
