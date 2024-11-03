@@ -24,7 +24,6 @@ int main() {
     } while (userInput.empty() || !(std::wstringstream(userInput) >> numPlayer) || !(std::to_wstring(numPlayer) == userInput) || numPlayer <= 1);
 
     std::vector <Player> players;
-    players.resize(numPlayer); /// @brief Resize vector to hold the players
 
     /// @brief Input players' name and initialize players
     for (unsigned int i = 0; i < numPlayer; ++i)
@@ -60,6 +59,7 @@ int main() {
         /// @brief Process each player's hand
         for (auto& player : players)
         {
+            std::wcout << player.name << L"'s hand: " << std::endl;
             SortHand(&player.hand);
             PrintHand(player.hand);
             HandRank rank = getBestHandRank(&player.hand);
