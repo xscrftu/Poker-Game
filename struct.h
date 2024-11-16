@@ -4,9 +4,9 @@
 
 #include <vector>        // Để sử dụng std::vector
 #include <iostream>      // Để sử dụng std::cout
-#include "struct.h"      
 #include <algorithm>     // Để sử dụng std::random_shuffle (hoặc std::shuffle)
 #include <ctime>         // Để sử dụng std::time
+#include <string>
 
 enum class CardSuit {
     Hearts, Diamonds, Spades, Clubs
@@ -31,8 +31,8 @@ public:
     /// @brief The rank of the card
     CardRank Rank = CardRank::Two;
 
-    Card() = default;
-    Card(CardRank rank, CardSuit suit) : Suit(suit), Rank(rank) {}
+    Card();
+    Card(CardRank rank, CardSuit suit);
 };
 
 struct Deck
@@ -40,45 +40,18 @@ struct Deck
 private:
     std::vector<Card> deck;
 
-    static std::vector<Card> createStandardDeck()
-    {
-        std::vector<Card> standardDeck;
-        for (CardSuit suit : {CardSuit::Hearts, CardSuit::Diamonds, CardSuit::Clubs, CardSuit::Spades})
-        {
-            for (CardRank rank : {CardRank::Two, CardRank::Three, CardRank::Four, CardRank::Five, CardRank::Six, CardRank::Seven, CardRank::Eight, CardRank::Nine, CardRank::Ten, CardRank::Jack, CardRank::Queen, CardRank::King, CardRank::Ace})
-            {
-                standardDeck.push_back(Card(rank, suit));
-            }
-        }
-        return standardDeck;
-    }
+    static std::vector<Card> createStandardDeck();
+
 public:
-    void shuffle()
-    {
-        std::srand(std::time(nullptr));
-        std::random_shuffle(deck.begin(), deck.end());
-    }
+    void shuffle();
 
-    Deck() : deck(createStandardDeck())
-    {
-        shuffle();
-    }
-
-    Card draw()
-    {
-        if (deck.empty())
-        {
-            std::cout << "Hết bài rồi";
-        }
-
-        Card drawnCard = deck.back();
-        deck.pop_back();
-        return drawnCard;
-    }
+    Deck();
+    Card draw();
 };
+
 struct Hand {
     Card cards[5];
     HandRank handPlayer;
 };
 
-#endif 
+#endif // STRUCTPOKER_H
