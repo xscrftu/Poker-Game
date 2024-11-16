@@ -11,8 +11,7 @@ enum class StatusRound
     Pre_flop = 1,
     Flop,
     Turn,
-    River,
-    Final
+    River
 };
 
 enum class PlayerState
@@ -122,6 +121,10 @@ std::wstring playerStatetoString(const PlayerState ps)
 
 void Call(Player &player, int &tablebet)
 {
+    if (player.behindMoney <= tablebet){
+        player.frontMoney = player.behindMoney;
+        player.playerState = PlayerState::ALLIN;
+    }
     player.frontMoney = tablebet;
 }
 void Check(Player &player, int &tablebet)
@@ -132,19 +135,24 @@ void Check(Player &player, int &tablebet)
 void Raise(Player &player, int &tablebet)
 {
     int moneyRaise;
-    cout << "Enter your raise money (>= min_raise): ";
-    cin >> moneyRaise;
-    if (player.behindMoney < tablebet)
+    
+    if (player.behindMoney <= tablebet)
     {
         player.frontMoney = player.behindMoney;
         player.playerState = PlayerState::ALLIN;
     }
     else
     {
-        while (moneyRaise < 2 * tablebet || moneyRaise < minRaise)
+        cout << "Enter your raise money (>= min_raise): ";
+        cin >> moneyRaise;
+        while (moneyRaise < 2 * tablebet || moneyRaise < minRaise || moneyRaise > player.behindMoney)
         {
-            cout << "Raise amount must be at least double the current table bet (" << tablebet << "). Please enter a valid amount: ";
+            cout << "Raise amount must be at least double the current table bet (" << tablebet << "$) and (<=" << player.behindMoney <<"$). Please enter a valid amount: ";
             cin >> moneyRaise;
+        }
+        if (moneyRaise == player.behindMoney) {
+            cout << "ALL IN !!!";
+            player.playerState = PlayerState::ALLIN;
         }
         player.frontMoney = moneyRaise;
         tablebet = moneyRaise;
@@ -235,6 +243,7 @@ void PrintCard(const Card &card)
 void GetAction(Player &player, int &tablebet)
 {
     int playerAction;
+    cout << "Your stack: " << player.behindMoney << "$\n" ;
     cout << "Choose your Action: 1 - Fold | 2 - Call | 3 - Raise | 4 - Allin\n";
     cout << "Your choose: ";
     while (!(std::cin >> playerAction) || playerAction < 1 || playerAction > 4){
@@ -276,6 +285,7 @@ void GetAction(Player &player, int &tablebet)
 void GetAction1(Player &player, int &tablebet)
 {
     int playerAction;
+    cout << "Your stack: " << player.behindMoney << "$\n" ;
     cout << "Choose your Action: 1 - Fold | 2 - Check | 3 - Raise | 4 - Allin\n";
     cout << "Your choose: ";
     while (!(std::cin >> playerAction) || playerAction < 1 || playerAction > 4){
@@ -304,6 +314,7 @@ void GetAction1(Player &player, int &tablebet)
     case 4:
         player.action = Action::Allin;
         player.playerState = PlayerState::ALLIN;
+        Allin(player, tablebet);
         cout << "ALL IN " << tablebet << "$" << endl;
         break;
     default:
@@ -311,7 +322,32 @@ void GetAction1(Player &player, int &tablebet)
         break;
     }
 }
-
+bool CheckFold(TableInfo *table, PlayerState ps, int j) // Hàm check liệu người chơi có bỏ bài hết không
+{
+    for (int i = 0; i < (*table).player.size(); ++i){
+        Player t = (*table).player[i];
+        if (t.playerState == PlayerState::OUT || i == j) // Kiểm tra tất cả trạng thái người chơi TRỪ người chơi thứ j(nghĩa là người chơi hiện tại)
+        {
+            continue;
+        } else if ( t.playerState != ps){
+            return false;
+        }
+    }
+    return true;
+}
+bool CheckAllin(TableInfo *table, PlayerState ps) // Hàm check liệu người chơi có all in hết không
+{
+    for (int i = 0; i < (*table).player.size(); ++i){
+        Player t = (*table).player[i];
+        if (t.playerState == PlayerState::OUT) // Kiểm tra tất cả trạng thái người chơi
+        {
+            continue;
+        } else if ( t.playerState != ps){
+            return false;
+        }
+    }
+    return true;
+}
 int main()
 {
 
@@ -337,7 +373,7 @@ int main()
 
     for (const auto &tableRound : table.round)
     {
-        std::wcout << roundtoString(tableRound) << endl; // in ra round hiện tại
+        std::wcout << "~~~ " << roundtoString(tableRound) << " ~~~" << endl; // in ra round hiện tại
         
         // show bài lên bàn theo round
         switch (tableRound)
@@ -355,11 +391,9 @@ int main()
             break;
         default:
             break;
-        }
-
+        }       
         
-        
-        int i;
+        int i; // Biến index người chơi 
         if (tableRound == StatusRound::Pre_flop){ // Nếu round Pre_Flop thì khởi tạo smallBlind bigBlind || Người chơi UTG sẽ bắt đầu bet
             i = 2;
             table.player[0].frontMoney = smallBlind;
@@ -376,29 +410,30 @@ int main()
         
         // Các vòng bet
         while (table.currTableBet != table.player[i].frontMoney){
-            cout << "\nCurrent Table Bet : " << table.currTableBet << endl;
+            if (CheckFold(&table, PlayerState::OUT, i) || CheckAllin(&table, PlayerState::ALLIN)) { // Nếu tất cả người chơi (trừ người chơi i) đã Fold hoặc All-In hủy vòng lặp
+                break;
+            }
+
             if (table.player[i].playerState == PlayerState::ALIVE || table.player[i].playerState == PlayerState::INIT )
             {
+                cout << "\nCurrent Table Bet : " << table.currTableBet << "$" << endl;
+                cout << "PLAYER " << i + 1 << " ";
                 if (table.currTableBet != 0)
                 {
-                    cout << "PLAYER " << i + 1 << " ";
                     GetAction(table.player[i], table.currTableBet);
                 }
                 else
                 {
-                    cout << "PLAYER " << i + 1<< " ";
                     GetAction1(table.player[i], table.currTableBet);
                 }
             }
             ++i;
-            if (i > table.numPlayer){
-                i = 0;
-            }
+            if (i > table.numPlayer) i = 0; // Khởi tạo lại i khi i vượt quá số người chơi
         }
         // Xác định lượng tiền trong POT, trừ tiền mà người chơi đã đặt cược
         for (auto &player_ : table.player)
         {
-            if (player_.frontMoney != 0) {
+            if (player_.frontMoney != 0 && player_.playerState != PlayerState::OUT) { // Kiểm tra nếu tiền cược # 0 và trạng thái người chơi # OUT thì trừ tiền trong POT
                 table.Pot += player_.frontMoney;
                 player_.behindMoney -= player_.frontMoney;
             }
@@ -409,7 +444,7 @@ int main()
         {
             player_.frontMoney = 0;
         }
-        cout << "POT: " << table.Pot  << "$" << endl;
+        cout << "\nPOT: " << table.Pot  << "$" << endl;
     }
     return 0;
 }
