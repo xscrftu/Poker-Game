@@ -138,8 +138,19 @@ void Raise(Player &player, int &tablebet)
     
     if (player.behindMoney <= tablebet)
     {
-        player.frontMoney = player.behindMoney;
-        player.playerState = PlayerState::ALLIN;
+        cout << "You have not enough money to RAISE. Just can ALL_IN !!\n";
+        cout << "Please decide your option: y - ALL_IN || n - Re_action\n";
+        char ch;
+        cout << "Your option: ";
+        cin >> ch;
+        if (ch == 'y'){
+            cout << "You have just ALL IN ";
+            player.frontMoney = player.behindMoney;
+            player.playerState = PlayerState::ALLIN;
+        }
+        // } else {
+        //     GetAction(player,tablebet); // Nếu người chơi chọn n (nghĩa là NO) thì cho người chơi option lại
+        // }
     }
     else
     {
@@ -414,7 +425,8 @@ int main()
                 break;
             }
 
-            if (table.player[i].playerState == PlayerState::ALIVE || table.player[i].playerState == PlayerState::INIT )
+            // Nếu người chơi còn sống hoặc mới khởi tạo thì cho người chơi hành động
+            if (table.player[i].playerState == PlayerState::ALIVE || table.player[i].playerState == PlayerState::INIT ) 
             {
                 cout << "\nCurrent Table Bet : " << table.currTableBet << "$" << endl;
                 cout << "PLAYER " << i + 1 << " ";
@@ -433,9 +445,9 @@ int main()
         // Xác định lượng tiền trong POT, trừ tiền mà người chơi đã đặt cược
         for (auto &player_ : table.player)
         {
-            if (player_.frontMoney != 0 && player_.playerState != PlayerState::OUT) { // Kiểm tra nếu tiền cược # 0 và trạng thái người chơi # OUT thì trừ tiền trong POT
+            if (player_.frontMoney != 0 && player_.playerState != PlayerState::OUT && player_.frontMoney != -1) { // Kiểm tra nếu tiền cược # 0 và trạng thái người chơi # OUT thì trừ tiền trong POT
                 table.Pot += player_.frontMoney;
-                player_.behindMoney -= player_.frontMoney;
+                player_.behindMoney -= player_.frontMoney;x
             }
         }
 
